@@ -40,7 +40,8 @@ using namespace std;
   *          (b) CUDA kernel function
   */
 void LinearLayer(float *A, float *B, float *C, float *D, int n, int k, int m) {
-    #pragma acc parallel loop copyin(A[0:n*k], B[0:k*m], C[0:m]) copyout(D[0:n*m])
+    #pragma acc data copyin(A[0:n*k], B[0:k*m], C[0:m]) copyout(D[0:n*m])
+    #pragma acc parallel loop
     for (int i = 0; i < n; i++) {
         #pragma acc loop
         for (int j = 0; j < m; j++) {
@@ -61,6 +62,7 @@ void LinearLayer(float *A, float *B, float *C, float *D, int n, int k, int m) {
 
 /* TODO: Parallel the for loops */
 void Sigmoid(float *A, int n, int m) {
+    #pragma acc data copy(A[0:n*m])
     #pragma acc parallel loop
     for (int i = 0; i < n; i++) {
         #pragma acc loop
@@ -78,6 +80,7 @@ void Sigmoid(float *A, int n, int m) {
 
  /* TODO: Parallel the for loops */
 void Argmax(float *A, int *D, int n, int m) {
+    #pragma acc data copyin(A[0:n*m]) copyout(D[0:n])
     #pragma acc parallel loop
     for (int i = 0; i < n; i++) {
         float mx = A[i * m];
